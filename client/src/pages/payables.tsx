@@ -27,6 +27,7 @@ const payableFormSchema = insertPayableSchema.extend({
 type PayableFormData = z.infer<typeof payableFormSchema>;
 
 export default function Payables() {
+  const [showAll, setShowAll] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -279,7 +280,12 @@ export default function Payables() {
         <Card className="p-6">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-semibold text-gray-900">Payables List</h3>
-            <button className="text-primary hover:text-primary/80 text-sm font-medium">View All</button>
+            <button
+              className="text-primary hover:text-primary/80 text-sm font-medium"
+              onClick={() => setShowAll(!showAll)}
+            >
+              {showAll ? "Show Less" : "View All"}
+            </button>
           </div>
           <div className="space-y-4">
             {isLoading ? (

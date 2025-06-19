@@ -19,6 +19,12 @@ import {
   type InsertPayable
 } from "@shared/schema";
 import { db } from "./db";
+
+function checkDbConnection() {
+  if (!db) {
+    throw new Error("Database not connected. Please set DATABASE_URL environment variable.");
+  }
+}
 import { eq, desc, like } from "drizzle-orm";
 
 export interface IStorage {
@@ -82,6 +88,7 @@ export class DatabaseStorage implements IStorage {
 
   // Accounts
   async getAccounts(): Promise<Account[]> {
+    checkDbConnection();
     return await db.select().from(accounts);
   }
 
@@ -91,6 +98,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async createAccount(insertAccount: InsertAccount): Promise<Account> {
+    checkDbConnection();
     const [account] = await db
       .insert(accounts)
       .values(insertAccount)
@@ -228,6 +236,15 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return payable || undefined;
   }
+
+  async deleteAccount(id: number): Promise<boolean> {
+    checkDbConnection();
+    const result = await db.delete(accounts).where(eq(accounts.id, id));
+    return (result.rowCount ?? 0) > 0;
+  }
+
 }
+
+  
 
 export const storage = new DatabaseStorage();

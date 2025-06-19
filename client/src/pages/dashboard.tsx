@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ArrowUp, ArrowDown, ChartLine, TrendingUp, TrendingDown, ArrowUpDown } from "lucide-react";
 import { formatCurrency, formatDate } from "@/lib/utils";
 import type { Account } from "@shared/schema";
+import { useState } from "react";
 
 interface DashboardSummary {
   monthlyIncome: string;
@@ -26,6 +27,7 @@ interface RecentTransaction {
 }
 
 export default function Dashboard() {
+  const [showAll, setShowAll] = useState(false);
   const { data: summary, isLoading: summaryLoading } = useQuery<DashboardSummary>({
     queryKey: ["/api/dashboard/summary"],
   });
@@ -222,7 +224,12 @@ export default function Dashboard() {
               <h3 className="text-lg font-semibold text-gray-900">Recent Transactions</h3>
               <p className="text-sm text-gray-600 mt-1">Your latest financial activities</p>
             </div>
-            <button className="text-primary hover:text-primary/80 text-sm font-medium">View All</button>
+            <button
+              className="text-primary hover:text-primary/80 text-sm font-medium"
+              onClick={() => setShowAll(!showAll)}
+            >
+              {showAll ? "Show Less" : "View All"}
+            </button>
           </div>
         </div>
         <CardContent className="p-6">

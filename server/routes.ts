@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertIncomeSchema, insertExpenseSchema, insertTransferSchema, insertReceivableSchema, insertPayableSchema } from "@shared/schema";
+import { insertAccountSchema, insertIncomeSchema, insertExpenseSchema, insertTransferSchema, insertReceivableSchema, insertPayableSchema } from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Accounts routes
@@ -24,6 +24,16 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(account);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch account" });
+    }
+  });
+
+  app.post("/api/accounts", async (req, res) => {
+    try {
+      const validatedData = insertAccountSchema.parse(req.body);
+      const account = await storage.createAccount(validatedData);
+      res.status(201).json(account);
+    } catch (error) {
+      res.status(400).json({ message: "Invalid account data", error });
     }
   });
 
@@ -250,6 +260,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.status(500).json({ message: "Failed to update payable status" });
     }
   });
+
+  app.delete("/api/accounts/:id", async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const deleted = await storage.deleteAccount(id);
+
+      if (!deleted) {
+        return res.status(404).json({ message: "Account not found" });
+      }
+
+      res.status(200).json({ message: "Account deleted" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete account" });
+    }
+  });
+
+
 
   const httpServer = createServer(app);
   return httpServer;

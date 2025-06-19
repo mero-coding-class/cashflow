@@ -7,11 +7,13 @@ export function cn(...inputs: ClassValue[]) {
 
 export function formatCurrency(amount: string | number): string {
   const num = typeof amount === 'string' ? parseFloat(amount) : amount;
-  return new Intl.NumberFormat('en-US', {
+  return new Intl.NumberFormat('en-NP', {
     style: 'currency',
-    currency: 'USD',
+    currency: 'NPR',
+    minimumFractionDigits: 2
   }).format(num);
 }
+
 
 export function formatDate(date: string | Date): string {
   const d = new Date(date);

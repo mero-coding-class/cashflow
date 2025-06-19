@@ -64,7 +64,13 @@ export const payables = pgTable("payables", {
 
 export const insertAccountSchema = createInsertSchema(accounts).omit({
   id: true,
-  balance: true,
+}).refine((data) => {
+  // Allow account numbers with spaces, dashes, and other common formatting
+  const cleanAccountNumber = data.accountNumber.replace(/[\s-]/g, '');
+  return cleanAccountNumber.length >= 4;
+}, {
+  message: "Account number must be at least 4 digits",
+  path: ["accountNumber"]
 });
 
 export const insertIncomeSchema = createInsertSchema(incomeTransactions).omit({

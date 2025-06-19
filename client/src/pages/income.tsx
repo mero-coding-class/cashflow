@@ -16,6 +16,7 @@ import type { Account, Income } from "@shared/schema";
 import { ArrowUp, Plus } from "lucide-react";
 import { z } from "zod";
 
+
 const incomeFormSchema = insertIncomeSchema.extend({
   date: z.string().min(1, "Date is required"),
   amount: z.string().min(1, "Amount is required"),
@@ -35,6 +36,7 @@ const incomeSourceOptions = [
 ];
 
 export default function Income() {
+  const [showAll, setShowAll] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -207,10 +209,11 @@ export default function Income() {
                     <FormLabel>Description</FormLabel>
                     <FormControl>
                       <Textarea
-                        rows={3}
-                        placeholder="Optional description..."
-                        className="resize-none"
-                        {...field}
+                      rows={3}
+                      placeholder="Optional description..."
+                      className="resize-none"
+                      {...field}
+                      value={field.value ?? ""}
                       />
                     </FormControl>
                     <FormMessage />
@@ -234,15 +237,21 @@ export default function Income() {
         <Card className="p-6">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-semibold text-gray-900">Recent Income</h3>
-            <button className="text-primary hover:text-primary/80 text-sm font-medium">View All</button>
+            <button
+              className="text-primary hover:text-primary/80 text-sm font-medium"
+              onClick={() => setShowAll(!showAll)}
+            >
+              {showAll ? "Show Less" : "View All"}
+            </button>
+
           </div>
           <div className="space-y-4">
             {isLoading ? (
               <div className="text-center py-8">Loading...</div>
-            ) : incomeTransactions?.length === 0 ? (
+            ) : (incomeTransactions?.length ?? 0) === 0 ? (
               <div className="text-center py-8 text-gray-500">No income transactions yet</div>
             ) : (
-              incomeTransactions?.slice(0, 10).map((transaction) => (
+              (showAll ? incomeTransactions ?? [] : incomeTransactions?.slice(0, 10) ?? []).map((transaction) => (
                 <div
                   key={transaction.id}
                   className="flex items-center justify-between py-3 border-b border-gray-100 last:border-b-0"
@@ -268,6 +277,8 @@ export default function Income() {
                 </div>
               ))
             )}
+
+
           </div>
         </Card>
       </div>

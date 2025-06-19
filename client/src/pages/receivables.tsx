@@ -27,6 +27,7 @@ const receivableFormSchema = insertReceivableSchema.extend({
 type ReceivableFormData = z.infer<typeof receivableFormSchema>;
 
 export default function Receivables() {
+  const [showAll, setShowAll] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -278,7 +279,12 @@ export default function Receivables() {
         <Card className="p-6">
           <div className="flex justify-between items-center mb-6">
             <h3 className="text-lg font-semibold text-gray-900">Receivables List</h3>
-            <button className="text-primary hover:text-primary/80 text-sm font-medium">View All</button>
+            <button
+              className="text-primary hover:text-primary/80 text-sm font-medium"
+              onClick={() => setShowAll(!showAll)}
+            >
+              {showAll ? "Show Less" : "View All"}
+            </button>
           </div>
           <div className="space-y-4">
             {isLoading ? (

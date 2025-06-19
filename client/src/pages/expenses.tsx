@@ -39,6 +39,7 @@ const expenseCategoryOptions = [
 ];
 
 export default function Expenses() {
+  const [showAll, setShowAll] = useState(false);
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
@@ -100,8 +101,33 @@ export default function Expenses() {
   });
 
   const onSubmit = (data: ExpenseFormData) => {
-    createExpenseMutation.mutate(data);
-  };
+  const account = accounts?.find(acc => acc.id === parseInt(data.accountId));
+  const enteredAmount = parseFloat(data.amount);
+
+  if (!account) {
+    toast({
+      title: "Error",
+      description: "Selected account not found.",
+      variant: "destructive",
+    });
+    return;
+  }
+
+  const currentBalance = parseFloat(account.balance);
+
+  if (enteredAmount > currentBalance) {
+    toast({
+      title: "Insufficient Funds",
+      description: `You only have ${formatCurrency(currentBalance)} in this account.`,
+      variant: "destructive",
+    });
+    return;
+  }
+
+  // Proceed with mutation
+  createExpenseMutation.mutate(data);
+};
+
 
   const getAccountName = (accountId: number) => {
     return accounts?.find(acc => acc.id === accountId)?.name || "Unknown Account";
@@ -269,7 +295,12 @@ export default function Expenses() {
           <Card className="p-6">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-lg font-semibold text-gray-900">Recent Expenses</h3>
-              <button className="text-primary hover:text-primary/80 text-sm font-medium">View All</button>
+              <button
+              className="text-primary hover:text-primary/80 text-sm font-medium"
+              onClick={() => setShowAll(!showAll)}
+            >
+              {showAll ? "Show Less" : "View All"}
+            </button>
             </div>
             <div className="space-y-4">
               {isLoading ? (
